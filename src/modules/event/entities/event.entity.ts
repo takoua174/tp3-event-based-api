@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
 } from 'typeorm';
+import { OperationEnum } from '../enums/operation.enum';
 
 @Entity('events')
 export class EventEntity {
@@ -18,7 +19,7 @@ export class EventEntity {
   userId: string;
 
   @Column()
-  operation: string;
+  operation: OperationEnum;
 
   @Column('json')
   details: any;

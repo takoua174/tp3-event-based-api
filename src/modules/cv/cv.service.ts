@@ -8,6 +8,7 @@ import { BaseService } from '../../common/services/base.service';
 import { CV_EVENTS } from '../../common/constants/events.constants';
 import { CvEventPayload } from './cv-event-payload';
 import { UpdateCvDto } from './dto/update-cv.dto';
+import { OperationEnum } from '../event/enums/operation.enum';
 @Injectable()
 export class CvService extends BaseService<CvEntity> {
   constructor(
@@ -24,7 +25,7 @@ export class CvService extends BaseService<CvEntity> {
     const payload: CvEventPayload = {
       cvId: cv.id,
       userId,
-      operation: 'CREATE',
+      operation: OperationEnum.CREATE,
       details: { name: dto.name, content: dto.job },
     };
     this.eventEmitter.emit(CV_EVENTS.CREATED, payload);
@@ -36,7 +37,7 @@ export class CvService extends BaseService<CvEntity> {
     const payload: CvEventPayload = {
       cvId: cv.id,
       userId: dto.userId,
-      operation: 'UPDATE',
+      operation: OperationEnum.UPDATE,
       details: { name: dto.name, content: dto.job },
     };
     this.eventEmitter.emit(CV_EVENTS.UPDATED, payload);
@@ -50,7 +51,7 @@ export class CvService extends BaseService<CvEntity> {
     const payload: CvEventPayload = {
       cvId: id,
       userId,
-      operation: 'DELETE',
+      operation: OperationEnum.DELETE,
       details: { name: 'aleh fasakhtni :(' },
     };
     this.eventEmitter.emit(CV_EVENTS.DELETED, payload);
