@@ -20,7 +20,7 @@ export class CvService extends BaseService<CvEntity> {
     super(cvRepository);
   }
 
-  async createCv(dto: CreateCvDto, userId: string): Promise<CvEntity> {
+  async createCv(dto: CreateCvDto, userId: number): Promise<CvEntity> {
     const cv = await this.create({ ...dto, userId } as CvEntity);
     const payload: CvEventPayload = {
       cvId: cv.id,
@@ -32,7 +32,7 @@ export class CvService extends BaseService<CvEntity> {
     //await this.mailService.sendCvAddedEmail('admin@example.com', cv);
     return cv;
   }
-  async updateCv(id: string, dto: UpdateCvDto): Promise<CvEntity> {
+  async updateCv(id: number, dto: UpdateCvDto): Promise<CvEntity> {
     const cv = await this.update(id, dto as CvEntity);
     const payload: CvEventPayload = {
       cvId: cv.id,
@@ -44,8 +44,8 @@ export class CvService extends BaseService<CvEntity> {
     return cv;
   }
   async deleteCv(
-    id: string,
-    userId: string,
+    id: number,
+    userId: number,
   ): Promise<{ success: boolean; message: string }> {
     await this.delete(id);
     const payload: CvEventPayload = {
@@ -57,7 +57,7 @@ export class CvService extends BaseService<CvEntity> {
     this.eventEmitter.emit(CV_EVENTS.DELETED, payload);
     return { success: true, message: 'CV deleted successfully' };
   }
-  async findByUserId(userId: string): Promise<CvEntity[]> {
+  async findByUserId(userId: number): Promise<CvEntity[]> {
     return this.cvRepository.find({ where: { userId } });
   }
 }

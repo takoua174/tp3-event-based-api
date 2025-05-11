@@ -9,14 +9,14 @@ import { OperationEnum } from '../enums/operation.enum';
 
 @Entity('events')
 export class EventEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @Column()
-  cvId: string;
+  cvId: number;
 
   @Column()
-  userId: string;
+  userId: number;
 
   @Column()
   operation: OperationEnum;

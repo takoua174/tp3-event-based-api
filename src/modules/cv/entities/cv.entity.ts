@@ -9,8 +9,8 @@ import {
 import { BaseEntity } from '../../../common/entities/base.entity';
 @Entity('cvs')
 export class CvEntity extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  declare id: string;
+  @PrimaryGeneratedColumn('increment')
+  declare id: number;
 
   @Column()
   name: string;
@@ -19,7 +19,7 @@ export class CvEntity extends BaseEntity {
   firstname: string;
 
   @Column()
-  userId: string;
+  userId: number;
   @Column()
   age: number;
 

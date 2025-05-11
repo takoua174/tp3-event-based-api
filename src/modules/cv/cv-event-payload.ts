@@ -1,6 +1,6 @@
 export interface CvEventPayload {
-  cvId: string;
-  userId: string;
+  cvId: number;
+  userId: number;
   operation: string;
   details: any;
 }

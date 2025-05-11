@@ -16,7 +16,7 @@ export class UpdateCvDto {
     description: 'The ID of the user associated with the CV',
     example: '12345',
   })
-  userId: string;
+  userId: number;
 
   @ApiProperty({
     description: 'The age of the CV owner',

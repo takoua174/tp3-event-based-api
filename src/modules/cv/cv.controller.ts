@@ -36,7 +36,7 @@ export class CvController {
 
   @UseGuards(JwtAuthGuard)
   @Get('get-one/:id')
-  async findOne(@Param('id') id: string, @Request() req) {
+  async findOne(@Param('id') id: number, @Request() req) {
     console.log('req.user.role', req.user.role);
     if (req.user.role == Roles.Admin) {
       return this.cvService.findOne(id);
@@ -48,7 +48,7 @@ export class CvController {
   }
   @UseGuards(JwtAuthGuard)
   @Get('getAll')
-  async findall(@Param('id') id: string, @Request() req) {
+  async findall(@Param('id') id: number, @Request() req) {
     if (req.user.role == Roles.Admin) {
       return this.cvService.findAll();
     } else {
@@ -61,7 +61,7 @@ export class CvController {
   @UseGuards(JwtAuthGuard)
   @Patch('update/:id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() dto: UpdateCvDto,
     @Request() req,
   ) {
@@ -70,7 +70,7 @@ export class CvController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
-  async delete(@Param('id') id: string, @Request() req) {
+  async delete(@Param('id') id: number, @Request() req) {
     return await this.cvService.deleteCv(id, req.user.userId);
   }
 }

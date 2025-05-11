@@ -3,8 +3,8 @@ import { Roles } from '../../auth/enums/roles.enum';
 import { BaseEntity } from '../../../common/entities/base.entity';
 @Entity('users')
 export class UserEntity extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  declare id: string;
+  @PrimaryGeneratedColumn('increment')
+  declare id: number;
 
   @Column({ unique: true })
   email: string;
