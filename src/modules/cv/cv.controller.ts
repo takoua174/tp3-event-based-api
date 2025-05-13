@@ -8,6 +8,8 @@ import {
   Delete,
   Request,
   UseGuards,
+  Sse,
+  Req
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CvService } from './cv.service';
@@ -16,11 +18,16 @@ import { ApiTags } from '@nestjs/swagger';
 import { UpdateCvDto } from './dto/update-cv.dto';
 import { Roles } from '../auth/enums/roles.enum';
 import { UnauthorizedException } from '@nestjs/common';
+import { filter, map, Observable, Subject } from 'rxjs';
+import { EventService } from '../event/event.service';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('cvs')
 @Controller('cvs')
 export class CvController {
-  constructor(private readonly cvService: CvService) {}
+  constructor(private readonly cvService: CvService, private readonly eventService: EventService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('create')
@@ -65,12 +72,46 @@ export class CvController {
     @Body() dto: UpdateCvDto,
     @Request() req,
   ) {
-    return await this.cvService.updateCv(id, dto);
+    return await this.cvService.updateCv(id, dto , req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: number, @Request() req) {
     return await this.cvService.deleteCv(id, req.user.userId);
+  }
+
+  @Sse('events')
+  cvEvents(@Request() request): Observable<any> {
+     console.log('SSE connection established');
+    const token = request.query.token?.toString();
+
+    if (!token) {
+      throw new UnauthorizedException('Missing token');
+    }
+
+    let decoded: any;
+    try {
+      decoded = this.jwtService.verify(token);
+    } catch (err) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    const userId = decoded.sub;
+    const userRole = decoded.role;
+    return this.eventService.getEventSubject().asObservable().pipe(
+      filter((event) => {
+      // Filter events for admin or the specific user
+      const shouldStream = userRole === 'admin' || event.userId === userId;
+      console.log('Filter check:', { userRole, userId, eventUserId: event.userId, shouldStream });
+      return shouldStream;
+    }),
+    map((event) => {
+      // Log the event being streamed
+      console.log('Streaming event to client:', event);
+      // Return the event in SSE format
+      return { data: event };
+    }),
+    )
   }
 }

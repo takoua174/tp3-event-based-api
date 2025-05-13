@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SSE Notifications</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2rem;
+        background-color: #f4f4f4;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      .notification {
+        border-left: 6px solid #007bff;
+        background: white;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        transition: background 0.3s;
+      }
+
+      .notification.create {
+        border-color: #28a745;
+      }
+
+      .notification.update {
+        border-color: #ffc107;
+      }
+
+      .notification.delete {
+        border-color: #dc3545;
+      }
+
+      .notification .title {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .notification .content {
+        margin-bottom: 0.25rem;
+      }
+
+      .notification .time {
+        font-size: 0.85rem;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Live CV Notifications</h1>
+    <div id="notifications"></div>
+
+    <script>
+      const token =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFjaHJlZkBnbWFpbC5jb20iLCJzdWIiOjIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQ3MTMwMTA4LCJleHAiOjE3NDcxMzM3MDh9.c1_8mCEtSVnrR9AM34Lke2vG0gyKG0bHKO3hWa4jG78';
+
+      const es = new EventSource(
+        `http://localhost:3000/cvs/events?token=${token}`,
+      );
+
+      const notificationsContainer = document.getElementById('notifications');
+
+      es.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log('Received SSE:', data);
+
+        const div = document.createElement('div');
+        div.className = `notification ${data.operation.toLowerCase()}`;
+
+        const now = new Date().toLocaleTimeString();
+
+        div.innerHTML = `
+          <div class="title">${data.operation} - CV ID: ${data.cvId}</div>
+          <div class="content"><strong>Family Name:</strong> ${data.details?.name || 'N/A'}</div>
+            <div class="content"><strong>First Name:</strong> ${data.details?.firstname || 'N/A'}</div>
+          <div class="content"><strong>Job:</strong> ${data.details?.job || 'N/A'}</div>
+            <div class="content"><strong>comment:</strong> ${data.details?.comment || 'N/A'}</div>
+          <div class="time">Received at: ${now}</div>
+        `;
+
+        notificationsContainer.prepend(div);
+      };
+
+      es.onerror = (err) => {
+        console.error('SSE error', err);
+        const div = document.createElement('div');
+        div.textContent = 'Connection error. Try refreshing.';
+        div.style.color = 'red';
+        notificationsContainer.appendChild(div);
+      };
+    </script>
+  </body>
+</html>

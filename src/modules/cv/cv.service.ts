@@ -26,20 +26,21 @@ export class CvService extends BaseService<CvEntity> {
       cvId: cv.id,
       userId,
       operation: OperationEnum.CREATE,
-      details: { name: dto.name, content: dto.job },
+      details: { name: dto.name, firstname : dto.firstname,  job: dto.job },
     };
     this.eventEmitter.emit(CV_EVENTS.CREATED, payload);
     //await this.mailService.sendCvAddedEmail('admin@example.com', cv);
     return cv;
   }
-  async updateCv(id: number, dto: UpdateCvDto): Promise<CvEntity> {
+  async updateCv(id: number, dto: UpdateCvDto , userId : number): Promise<CvEntity> {
     const cv = await this.update(id, dto as CvEntity);
     const payload: CvEventPayload = {
       cvId: cv.id,
-      userId: dto.userId,
+      userId: userId,
       operation: OperationEnum.UPDATE,
-      details: { name: dto.name, content: dto.job },
+      details: { name: dto.name, firstname : dto.firstname,  job: dto.job },
     };
+    console.log('Emitting event:', payload);
     this.eventEmitter.emit(CV_EVENTS.UPDATED, payload);
     return cv;
   }
@@ -52,7 +53,7 @@ export class CvService extends BaseService<CvEntity> {
       cvId: id,
       userId,
       operation: OperationEnum.DELETE,
-      details: { name: 'aleh fasakhtni :(' },
+      details: { comment: 'aleh fasakhtni :(' },
     };
     this.eventEmitter.emit(CV_EVENTS.DELETED, payload);
     return { success: true, message: 'CV deleted successfully' };
